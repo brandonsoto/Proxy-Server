@@ -10,19 +10,19 @@ print 'server port ', server_port
 print 'server name ', server_name
 
 # Create a server socket, bind it to a port and start listening
-tcpSerSock = socket(AF_INET, SOCK_STREAM)
-tcpSerSock.bind(('', server_port))
-tcpSerSock.listen(1)
+handshake_socket = socket(AF_INET, SOCK_STREAM)
+handshake_socket.bind(('', server_port))
+handshake_socket.listen(1)
 
 while True:
     # Start receiving data from the client
     print 'Ready to serve...'
 
-    tcpCliSock, addr = tcpSerSock.accept()
+    client_socket, client_address = handshake_socket.accept()
 
-    print 'Received a connection from:', addr
+    print 'Received a connection from:', client_address
 
-    message = tcpCliSock.recv(message_size)
+    message = client_socket.recv(message_size)
 
     print '---------------------------------------------------------'
     print 'Received -> \n', message[:]
@@ -33,42 +33,44 @@ while True:
         print message.split()[1]
         filename = message.split()[1].partition("/")[2]
         filename = filename[1:len(filename)-1]
-        fileExist = "false"
+        file_exists = False
         #filetouse = "/" + filename TODO: reenable
         print 'file = ', filename
 
         try:
             # Check wether the file exist in the cache
             #f = open(filetouse[1:], "r") TODO: reenable
-            f = open(filename, "r")
-            outputdata = f.readlines()
-            fileExist = "true"
+            file = open(filename, "r")
+
+            file.readlines()
+            file_exists = True
+
             # ProxyServer finds a cache hit and generates a response message
-            tcpCliSock.send("HTTP/1.0 200 OK\r\n")
-            tcpCliSock.send("Content-Type:text/html\r\n")
-            tcpCliSock.send(f.read())
+            client_socket.send("HTTP/1.0 200 OK\r\n")
+            client_socket.send("Content-Type:text/html\r\n")
+            client_socket.send(file.read())
 
         # Error handling for file not found in cache
         except IOError:
-            if fileExist == "false":
+            if not file_exists:
                 # Create a socket on the proxyserver
-                c = '' # TODO Fill in start.                               # Fill in end.
-                hostn = filename.replace("www.", "", 1)
-                print hostn
+                proxy_server_socket = '' # TODO Fill in start.                               # Fill in end.
+                hostname = filename.replace("www.", "", 1)
+                print hostname
                 try:
                     # Connect to the socket to port 80
                     # TODO Fill in start.
                     # Fill in end.
                     # Create a temporary file on this socket and ask port 80 for the file requested by the client
-                    fileobj = c.makefile('r', 0)
-                    fileobj.write("GET " + "http://" + filename + " HTTP / 1.0\n\n")
+                    file_object = proxy_server_socket.makefile('r', 0)
+                    file_object.write("GET " + "http://" + filename + " HTTP / 1.0\n\n")
                     # Read the response into buffer
                     # TODO Fill in start.
                     # Fill in end.
                     # Create a new file in the cache for the requested file.
                     # Also send the response in the buffer to client socket
                     # and the corresponding file in the cache
-                    tmpFile = open("./" + filename, "wb")
+                    temp_file = open("./" + filename, "wb")
                     # TODO Fill in start.
                     # Fill in end.
                 except:
@@ -80,7 +82,7 @@ while True:
                 # Fill in end.
 
     # Close the client and the server sockets
-    tcpCliSock.close()
+    client_socket.close()
 
 # TODO Fill in start.
 # Fill in end.
