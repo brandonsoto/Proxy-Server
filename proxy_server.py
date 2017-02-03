@@ -115,6 +115,8 @@ def proxy_thread(client_socket, client_address):
         webserver_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         try:
+            # TODO: send conditional GET to webserver and cache html objects
+
             webserver_socket.connect((webserver_name, webserver_port))
             webserver_socket.send(browser_request)  # forward request to webserver
 
