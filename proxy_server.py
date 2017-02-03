@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Thanks to Luu Thuy (http://luugiathuy.com/2011/03/simple-web-proxy-python)
-# This was adapted from yous.
+# This was adapted from his.
 
 import os, sys, thread, socket
 
